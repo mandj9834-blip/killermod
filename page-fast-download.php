@@ -52,7 +52,8 @@ if (!$mod_post) { ?>
 
 $pid         = $mod_post->ID;
 $version     = get_post_meta($pid, '_km_version', true);
-$size        = get_post_meta($pid, '_km_size', true);
+$size_raw    = get_post_meta($pid, '_km_size', true);
+$size        = $size_raw ? (is_numeric($size_raw) ? $size_raw . ' MB' : $size_raw) : '';
 $package     = get_post_meta($pid, '_km_package', true);
 $features    = get_post_meta($pid, '_km_mod_features', true);
 $features_l  = !empty($features) ? array_filter(array_map('trim', explode("\n", $features))) : [];
@@ -60,9 +61,10 @@ $feature_1st = !empty($features_l) ? reset($features_l) : '';
 $cats        = get_the_category($pid);
 $cat_name    = !empty($cats) ? $cats[0]->name : 'Mod Games';
 $thumb       = get_the_post_thumbnail_url($pid, 'thumbnail');
-$apk_url     = get_option('killermod_app_apk_url', '');
+// Per-post app link (set in KillerMod Manager plugin) takes priority over global APK URL.
 $app_link    = get_post_meta($pid, '_km_app_link', true);
-if (!$app_link) $app_link = home_url('/fast-download/?mod=' . $mod_post->post_name);
+$apk_url     = get_option('killermod_app_apk_url', '');
+$cta_url     = $app_link ?: $apk_url;
 
 $recommended = get_posts([
     'post_type'      => 'post',
@@ -503,10 +505,10 @@ body.light-mode .fd2-pro-btn { color: #231806; }
     <p>This mod downloads inside the <strong>KillerMod App</strong> &mdash; faster, no ads, no waiting.</p>
   </div>
 
-  <!-- CTA BUTTON -->
+  <!-- CTA BUTTON — uses _km_app_link (per-post, from KillerMod Manager), then global APK URL -->
   <div class="fd2-cta-wrap">
-    <?php if ($apk_url) : ?>
-      <a class="fd2-cta" href="<?php echo esc_url($apk_url); ?>">
+    <?php if ($cta_url) : ?>
+      <a class="fd2-cta" href="<?php echo esc_url($cta_url); ?>">
         Fast Download <span class="arrow">&#8595;</span>
       </a>
     <?php else : ?>
@@ -571,7 +573,7 @@ body.light-mode .fd2-pro-btn { color: #231806; }
 
 </main>
 
-<?php if (!$apk_url) : ?>
+<?php if (!$cta_url) : ?>
 <script>
 (function () {
   var btn = document.getElementById('kmFd2Btn');
