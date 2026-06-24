@@ -508,7 +508,7 @@ body.light-mode .fd2-pro-btn { color: #231806; }
   <!-- CTA BUTTON — uses _km_app_link (per-post, from KillerMod Manager), then global APK URL -->
   <div class="fd2-cta-wrap">
     <?php if ($cta_url) : ?>
-      <a class="fd2-cta" href="<?php echo esc_url($cta_url); ?>">
+      <a class="fd2-cta" href="<?php echo esc_url($cta_url); ?>" target="_blank" rel="noopener noreferrer">
         Fast Download <span class="arrow">&#8595;</span>
       </a>
     <?php else : ?>
